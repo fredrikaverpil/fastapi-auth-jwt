@@ -12,4 +12,5 @@ pip install -e .
 uvicorn demo.app:app --reload
 ```
 
-Go to http://127.0.0.1:8000/docs to test the API out.
+1. Go to http://127.0.0.1:8000/docs
+2. Click padlock next to `/users/me` and try the endpoint out with username `foo` with password `bar`.

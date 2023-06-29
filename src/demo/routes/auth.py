@@ -1,11 +1,11 @@
-from datetime import datetime, timedelta, timezone
+from datetime import timedelta
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
-from jose import jwt
 
-from demo.lib.secrets import ALGORITHM, SECRET_KEY, bcrypt_context
+from demo.lib.jwt import create_access_token
+from demo.lib.password import verify_password
 
 from .users import IN_MEMORY_USERS_DB
 
@@ -29,20 +29,10 @@ async def authenticate_user(
 
     if not user_record:
         return False
-    if not bcrypt_context.verify(password, user_password):
+    if not verify_password(password, user_password):
         return False
 
     return user_record
-
-
-async def create_access_token(
-    username: str,
-    user_id: int,
-    expires_delta: timedelta,
-):
-    expires_at = datetime.now(tz=timezone.utc) + expires_delta
-    to_encode = {"sub": username, "id": user_id, "exp": expires_at}
-    return jwt.encode(claims=to_encode, key=SECRET_KEY, algorithm=ALGORITHM)
 
 
 @router.post("/token")

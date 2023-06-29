@@ -3,7 +3,8 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
 from jose import jwt
 
-from demo.lib.secrets import ALGORITHM, SECRET_KEY, bcrypt_context, oauth2_bearer
+from demo.lib.jwt import ALGORITHM, SECRET_KEY, oauth2_bearer
+from demo.lib.password import bcrypt_context
 
 router = APIRouter(
     prefix="/users",
