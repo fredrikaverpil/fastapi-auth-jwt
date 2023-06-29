@@ -12,8 +12,6 @@ router = APIRouter(
 )
 
 
-# TODO: bcrypt ...
-
 IN_MEMORY_USERS_DB = [
     {
         "id": 1,
