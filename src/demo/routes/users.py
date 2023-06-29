@@ -1,7 +1,7 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from jose import jwt, JWTError
+from jose import JWTError, jwt
 
 from demo.lib.jwt import ALGORITHM, SECRET_KEY
 from demo.lib.oauth2 import oauth2_bearer
