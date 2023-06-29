@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from jose import JWTError, jwt
 
 from demo.lib.jwt import ALGORITHM, SECRET_KEY
+from demo.lib.models import User
 from demo.lib.oauth2 import oauth2_bearer
 from demo.lib.password import bcrypt_context
 
@@ -24,7 +25,7 @@ IN_MEMORY_USERS_DB = [
 
 async def get_current_user(
     token: Annotated[str, Depends(oauth2_bearer)],
-):
+) -> User:
     try:
         payload = jwt.decode(token=token, key=SECRET_KEY, algorithms=[ALGORITHM])
     except JWTError as err:
@@ -33,28 +34,25 @@ async def get_current_user(
             detail="Could not validate user",
         ) from err
 
-    username: str = payload.get("sub")
-    user_id: int = payload.get("id")
+    username: str | None = payload.get("sub")
+    user_id: int | None = payload.get("id")
 
-    if username is None or user_id is None:
+    if not username or not user_id:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate user",
         )
 
-    return {"username": username, "id": user_id}
+    return User(username=username, id=user_id)
 
 
-user_dependency = Annotated[dict, Depends(get_current_user)]
-
-
-@router.get("/me")
+@router.get(
+    "/me",
+    status_code=status.HTTP_200_OK,
+    response_model=User,
+    responses={status.HTTP_401_UNAUTHORIZED: {"description": "Not authenticated"}},
+)
 async def my_user_details(
-    user: user_dependency,
-):
-    if user is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Authenticated failed",
-        )
+    user: Annotated[User, Depends(get_current_user)],
+) -> User:
     return user
