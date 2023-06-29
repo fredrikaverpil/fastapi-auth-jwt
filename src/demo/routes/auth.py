@@ -20,6 +20,7 @@ async def authenticate_user(
     password: str,
 ):
     user_record = None
+    user_password = None
     for record in IN_MEMORY_USERS_DB:
         if record["username"] == username:
             user_record = record.copy()
@@ -27,9 +28,9 @@ async def authenticate_user(
             user_record.pop("password")  # NOTE: don't return the password hash
             break
 
-    if not user_record:
+    if not user_record or not user_password:
         return False
-    if not verify_password(password, user_password):
+    if not await verify_password(password, user_password):
         return False
 
     return user_record

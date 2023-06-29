@@ -3,7 +3,8 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
 from jose import jwt
 
-from demo.lib.jwt import ALGORITHM, SECRET_KEY, oauth2_bearer
+from demo.lib.jwt import ALGORITHM, SECRET_KEY
+from demo.lib.oauth2 import oauth2_bearer
 from demo.lib.password import bcrypt_context
 
 router = APIRouter(
@@ -17,7 +18,7 @@ IN_MEMORY_USERS_DB = [
         "id": 1,
         "username": "foo",
         "password": bcrypt_context.hash("bar"),
-    }
+    },
 ]
 
 
