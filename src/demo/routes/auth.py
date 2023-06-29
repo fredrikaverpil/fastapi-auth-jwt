@@ -58,6 +58,6 @@ async def login_for_access_token(
     token = await create_access_token(
         username=user.username,
         user_id=user.id,
-        expires_delta=timedelta(minutes=20),
+        expires_delta=timedelta(minutes=1),
     )
     return {"access_token": token, "token_type": "bearer"}
