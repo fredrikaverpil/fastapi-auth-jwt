@@ -1,18 +1,18 @@
 from datetime import datetime, timedelta, timezone
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from jose import jwt
 
-from .users import IN_MEMORY_USERS_DB, bcrypt_context
+from demo.lib.secrets import ALGORITHM, SECRET_KEY, bcrypt_context
 
-router = APIRouter()
+from .users import IN_MEMORY_USERS_DB
 
-# WARNING: don't store the secret key like this!
-# Generated with: openssl rand -hex 32
-SECRET_KEY = "fc5fe393d93d0f1c980eb88aafb56f90d1ae4cdfaaf4060455ef8e635157fd36"
-ALGORITHM = "HS256"
+router = APIRouter(
+    prefix="/auth",
+    tags=["auth"],
+)
 
 
 async def authenticate_user(
@@ -51,8 +51,9 @@ async def login_for_access_token(
 ):
     user = await authenticate_user(form_data.username, form_data.password)
     if not user:
-        return "Failed to authenticate user"
-
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token"
+        )
     token = await create_access_token(
         username=user["username"],
         user_id=user["id"],
